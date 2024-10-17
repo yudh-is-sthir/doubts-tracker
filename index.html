@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Doubts app - A web app that stores all your doubts</title>
+  </head>
+  <body>
+    <form
+      id="doubtsForm"
+      action="/doubts/add"
+      method="post"
+      enctype="application/x-www-form-urlencoded"
+    >
+      <textarea
+        style="width: 100%"
+        name="DoubtsArea"
+        id="DoubtsArea"
+        cols="30"
+        rows="10"
+        placeholder="paste your doubts or type them here.."
+      ></textarea>
+      <br />
+      <input type="submit" value="Submit Data" />
+    </form>
+
+    <!-- Table to display doubts -->
+    <table border="1" id="doubtsTable" style="width: 100%; margin-top: 20px">
+      <thead>
+        <tr>
+          <th>Doubt</th>
+          <th>Edit</th>
+          <th>Delete</th>
+          <th>Completed</th>
+        </tr>
+      </thead>
+      <tbody id="doubtsTableBody">
+        <!-- Doubts will be dynamically injected here -->
+      </tbody>
+    </table>
+
+    <script>
+      document
+        .getElementById("doubtsForm")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+          const formData = new FormData(this);
+
+          // Log form data for debugging
+          for (let [key, value] of formData.entries()) {
+            console.log(key, value); // Log each form field and its value
+          }
+
+          // Send data to the backend
+          const response = await fetch("/doubts/add", {
+            method: "POST",
+            body: new URLSearchParams(formData), // Use URLSearchParams to correctly encode the form data
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded", // Explicitly set the content type
+            },
+          });
+
+          // Get the updated list of doubts and refresh the table
+          const doubtsList = await response.json();
+          displayDoubtsInTable(doubtsList);
+        });
+      // Function to display doubts in the table
+      function displayDoubtsInTable(doubtsList) {
+        const tableBody = document.getElementById("doubtsTableBody");
+        tableBody.innerHTML = ""; // Clear previous data
+
+        doubtsList.forEach((doubt, index) => {
+          const row = document.createElement("tr");
+
+          const doubtCell = document.createElement("td");
+          doubtCell.innerText = doubt;
+          row.appendChild(doubtCell);
+
+          const editCell = document.createElement("td");
+          const editButton = document.createElement("button");
+          editButton.innerText = "Edit";
+          editButton.onclick = () => editDoubt(index);
+          editCell.appendChild(editButton);
+          row.appendChild(editCell);
+
+          const deleteCell = document.createElement("td");
+          const deleteButton = document.createElement("button");
+          deleteButton.innerText = "Delete";
+          deleteButton.onclick = () => deleteDoubt(index);
+          deleteCell.appendChild(deleteButton);
+          row.appendChild(deleteCell);
+
+          const completeCell = document.createElement("td");
+          const completeButton = document.createElement("button");
+          completeButton.innerText = "Completed";
+          completeButton.onclick = () => completeDoubt(index);
+          completeCell.appendChild(completeButton);
+          row.appendChild(completeCell);
+
+          tableBody.appendChild(row);
+        });
+      }
+
+      // Add the JavaScript logic to handle edit, delete, and complete later
+      function editDoubt(index) {
+        // Logic for editing doubts
+        console.log("Edit doubt at index", index);
+      }
+
+      function deleteDoubt(index) {
+        // Logic for deleting doubts
+        console.log("Delete doubt at index", index);
+      }
+
+      function completeDoubt(index) {
+        // Logic for marking doubts as completed
+        console.log("Mark doubt as completed at index", index);
+      }
+    </script>
+  </body>
+</html>
