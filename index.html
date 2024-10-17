@@ -66,6 +66,15 @@
         });
       // Function to display doubts in the table
       function displayDoubtsInTable(doubtsList) {
+        // Check if doubtsList is an array
+        if (!Array.isArray(doubtsList)) {
+          console.error(
+            "Expected doubtsList to be an array, but got:",
+            doubtsList
+          );
+          doubtsList = []; // Initialize as an empty array to avoid errors
+        }
+
         const tableBody = document.getElementById("doubtsTableBody");
         tableBody.innerHTML = ""; // Clear previous data
 

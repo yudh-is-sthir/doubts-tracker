@@ -5,7 +5,6 @@ const path = require("path");
 const router = express.Router();
 const filePath = path.join(__dirname, "../doubts.json");
 
-// Route to add new doubts
 router.post("/add", (req, res) => {
   const { DoubtsArea } = req.body;
 
@@ -23,7 +22,7 @@ router.post("/add", (req, res) => {
     try {
       doubtsData = JSON.parse(data);
 
-      // If the data isn't an array, initialize it as an empty array
+      // If the data isn't an array (or is null), initialize it as an empty array
       if (!Array.isArray(doubtsData)) {
         doubtsData = [];
       }
@@ -32,15 +31,8 @@ router.post("/add", (req, res) => {
       doubtsData = [];
     }
 
-    // Filter out duplicate doubts
-    newDoubts = newDoubts.filter(doubt => !doubtsData.includes(doubt));
-
-    // If there are no new doubts to add, return a message
-    if (newDoubts.length === 0) {
-      return res.json({ message: "No new doubts to add. All doubts are already present." });
-    }
-
     // Append new, non-duplicate doubts to the existing data
+    newDoubts = newDoubts.filter(doubt => !doubtsData.includes(doubt));
     doubtsData.push(...newDoubts);
 
     // Write the updated data back to the file
@@ -51,7 +43,7 @@ router.post("/add", (req, res) => {
       }
 
       // Send the updated list of doubts back as JSON to the frontend
-      res.json(doubtsData);
+      res.json(doubtsData);  // Always return an array, even if empty
     });
   });
 });
