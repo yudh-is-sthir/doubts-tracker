@@ -4,6 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Doubts app - A web app that stores all your doubts</title>
+
+    <style>
+      .deleted {
+        background-color: lightcoral;
+      }
+      .completed {
+        background-color: lightgreen;
+      }
+    </style>
   </head>
   <body>
     <form
@@ -66,23 +75,21 @@
         });
       // Function to display doubts in the table
       function displayDoubtsInTable(doubtsList) {
-        // Check if doubtsList is an array
-        if (!Array.isArray(doubtsList)) {
-          console.error(
-            "Expected doubtsList to be an array, but got:",
-            doubtsList
-          );
-          doubtsList = []; // Initialize as an empty array to avoid errors
-        }
-
         const tableBody = document.getElementById("doubtsTableBody");
         tableBody.innerHTML = ""; // Clear previous data
 
         doubtsList.forEach((doubt, index) => {
           const row = document.createElement("tr");
 
+          // Apply background class based on doubt status
+          if (doubt.status === "deleted") {
+            row.classList.add("deleted");
+          } else if (doubt.status === "completed") {
+            row.classList.add("completed");
+          }
+
           const doubtCell = document.createElement("td");
-          doubtCell.innerText = doubt;
+          doubtCell.innerText = doubt.text;
           row.appendChild(doubtCell);
 
           const editCell = document.createElement("td");
@@ -112,18 +119,29 @@
 
       // Add the JavaScript logic to handle edit, delete, and complete later
       function editDoubt(index) {
-        // Logic for editing doubts
-        console.log("Edit doubt at index", index);
+        const newText = prompt("Edit your doubt:");
+        if (newText) {
+          console.log(newText, typeof newText);
+          fetch(`/doubts/edit/${index}`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ text: newText }),
+          }).then(() => window.location.reload());
+        }
       }
 
       function deleteDoubt(index) {
-        // Logic for deleting doubts
-        console.log("Delete doubt at index", index);
+        fetch(`/doubts/delete/${index}`, {
+          method: "POST",
+        }).then(() => window.location.reload());
       }
 
       function completeDoubt(index) {
-        // Logic for marking doubts as completed
-        console.log("Mark doubt as completed at index", index);
+        fetch(`/doubts/complete/${index}`, {
+          method: "POST",
+        }).then(() => window.location.reload());
       }
     </script>
   </body>

@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "text": "what is the difference between mutable and unmutable data types explain with an example",
+    "status": "active"
+  },
+  {
+    "text": "doubt1",
+    "status": "deleted"
+  },
+  {
+    "text": "doubt2",
+    "status": "completed"
+  },
+  {
+    "text": "doubt3",
+    "status": "deleted"
+  }
+]

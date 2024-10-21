@@ -5,11 +5,14 @@ const path = require("path");
 const router = express.Router();
 const filePath = path.join(__dirname, "../doubts.json");
 
+// Add doubts route
 router.post("/add", (req, res) => {
   const { DoubtsArea } = req.body;
 
   // Split the textarea input into multiple doubts by newlines
-  let newDoubts = DoubtsArea.split("\n").map((doubt) => doubt.trim()).filter(Boolean);  // Filter out any empty lines
+  let newDoubts = DoubtsArea.split("\n")
+    .map((doubt) => doubt.trim())
+    .filter(Boolean); // Filter out any empty lines
 
   // Read the existing data from doubts.json
   fs.readFile(filePath, "utf8", (err, data) => {
@@ -31,9 +34,12 @@ router.post("/add", (req, res) => {
       doubtsData = [];
     }
 
-    // Append new, non-duplicate doubts to the existing data
-    newDoubts = newDoubts.filter(doubt => !doubtsData.includes(doubt));
-    doubtsData.push(...newDoubts);
+    // Append new, non-duplicate doubts to the existing data as objects with status
+    newDoubts.forEach((doubt) => {
+      if (!doubtsData.find((d) => d.text === doubt)) {
+        doubtsData.push({ text: doubt, status: "active" });
+      }
+    });
 
     // Write the updated data back to the file
     fs.writeFile(filePath, JSON.stringify(doubtsData, null, 2), (err) => {
@@ -43,8 +49,77 @@ router.post("/add", (req, res) => {
       }
 
       // Send the updated list of doubts back as JSON to the frontend
-      res.json(doubtsData);  // Always return an array, even if empty
+      res.json(doubtsData);
     });
+  });
+});
+
+// Delete doubt route
+router.post("/delete/:id", (req, res) => {
+  const doubtId = req.params.id;
+
+  fs.readFile(filePath, "utf8", (err, data) => {
+    if (err) {
+      return res.status(500).send("Error reading file");
+    }
+
+    let doubtsData = JSON.parse(data);
+    if (doubtsData[doubtId]) {
+      doubtsData[doubtId].status = "deleted";
+      fs.writeFile(filePath, JSON.stringify(doubtsData, null, 2), (err) => {
+        if (err) {
+          return res.status(500).send("Error writing file");
+        }
+        res.redirect("/");
+      });
+    }
+  });
+});
+
+// Complete doubt route
+router.post("/complete/:id", (req, res) => {
+  const doubtId = req.params.id;
+
+  fs.readFile(filePath, "utf8", (err, data) => {
+    if (err) {
+      return res.status(500).send("Error reading file");
+    }
+
+    let doubtsData = JSON.parse(data);
+    if (doubtsData[doubtId]) {
+      doubtsData[doubtId].status = "completed";
+      fs.writeFile(filePath, JSON.stringify(doubtsData, null, 2), (err) => {
+        if (err) {
+          return res.status(500).send("Error writing file");
+        }
+        res.redirect("/");
+      });
+    }
+  });
+});
+
+// Edit doubt route
+router.post("/edit/:id", (req, res) => {
+  const doubtId = req.params.id;
+  const { text } = req.body;
+
+  console.log(text);
+
+  fs.readFile(filePath, "utf8", (err, data) => {
+    if (err) {
+      return res.status(500).send("Error reading file");
+    }
+
+    let doubtsData = JSON.parse(data);
+    if (doubtsData[doubtId]) {
+      doubtsData[doubtId].text = text; // Update the text of the doubt
+      fs.writeFile(filePath, JSON.stringify(doubtsData, null, 2), (err) => {
+        if (err) {
+          return res.status(500).send("Error writing file");
+        }
+        res.redirect("/");
+      });
+    }
   });
 });
 
