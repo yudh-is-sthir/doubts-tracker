@@ -11,7 +11,8 @@ router.post("/add", (req, res) => {
 
   // Split the textarea input into multiple doubts by newlines
   let newDoubts = DoubtsArea.split("\n")
-    .map((doubt) => doubt.trim())
+    .map((doubt) => doubt.trim()) // Remove leading/trailing whitespace
+    .map((doubt) => doubt.replace(/^\W+|\W+$/g, "")) // Remove non-alphanumeric chars from start/end
     .filter(Boolean); // Filter out any empty lines
 
   // Read the existing data from doubts.json
@@ -34,12 +35,13 @@ router.post("/add", (req, res) => {
       doubtsData = [];
     }
 
-    // Append new, non-duplicate doubts to the existing data as objects with status
-    newDoubts.forEach((doubt) => {
-      if (!doubtsData.find((d) => d.text === doubt)) {
-        doubtsData.push({ text: doubt, status: "active" });
-      }
-    });
+    // Append new, non-duplicate doubts to the existing data
+    newDoubts = newDoubts.filter(
+      (doubt) => !doubtsData.some((d) => d.doubt === doubt)
+    );
+    doubtsData.push(
+      ...newDoubts.map((doubt) => ({ text: doubt, status: "active" }))
+    );
 
     // Write the updated data back to the file
     fs.writeFile(filePath, JSON.stringify(doubtsData, null, 2), (err) => {
@@ -49,7 +51,7 @@ router.post("/add", (req, res) => {
       }
 
       // Send the updated list of doubts back as JSON to the frontend
-      res.json(doubtsData);
+      res.json(doubtsData); // Always return an array, even if empty
     });
   });
 });
@@ -120,6 +122,30 @@ router.post("/edit/:id", (req, res) => {
         res.redirect("/");
       });
     }
+  });
+});
+
+router.get("/list", (req, res) => {
+  fs.readFile(filePath, "utf8", (err, data) => {
+    if (err) {
+      console.error("Error reading file:", err);
+      return res.status(500).send("Error reading file");
+    }
+
+    let doubtsData = [];
+    try {
+      doubtsData = JSON.parse(data);
+      if (!Array.isArray(doubtsData)) {
+        doubtsData = [];
+      }
+    } catch (err) {
+      console.error("Error parsing JSON:", err);
+      doubtsData = [];
+    }
+
+    // Send the doubts back as JSON
+    console.log(doubtsData);
+    res.json(doubtsData);
   });
 });
 

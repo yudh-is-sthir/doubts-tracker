@@ -1,18 +1,18 @@
 [
   {
-    "text": "what is the difference between mutable and unmutable data types explain with an example",
-    "status": "active"
+    "text": "what is the difference between mutable and immutable data types explain with an example",
+    "status": ""
+  },
+  {
+    "text": "AIML - consider A -> B, if A is true then B is also true. But if A is false then how come B may be false or true",
+    "status": ""
   },
   {
     "text": "doubt1",
-    "status": "deleted"
-  },
-  {
-    "text": "doubt2",
-    "status": "completed"
+    "status": "active"
   },
   {
     "text": "doubt3",
-    "status": "deleted"
+    "status": "active"
   }
 ]

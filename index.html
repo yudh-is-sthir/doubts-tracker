@@ -143,6 +143,14 @@
           method: "POST",
         }).then(() => window.location.reload());
       }
+
+      window.onload = async function () {
+        const response = await fetch("/doubts/list"); // Make sure your backend has a route to fetch doubts
+        const doubtsList = await response.json();
+        if (doubtsList.length > 0) {
+          displayDoubtsInTable(doubtsList);
+        }
+      };
     </script>
   </body>
 </html>
